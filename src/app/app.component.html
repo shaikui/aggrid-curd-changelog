@@ -1,0 +1,18 @@
+
+<button (click)="importExcel()">Import Excel</button>
+<button (click)="remove()">Remove</button>
+<button (click)="getChangeLog()">Change Log</button>
+<ag-grid-angular
+    style="width: 500px; height: 500px;"
+    class="ag-theme-alpine"
+    [rowData]="rowData"
+    [columnDefs]="columnDefs"
+    (gridReady)="onGridReady($event)"
+    [rowSelection]="rowS"
+    [processDataFromClipboard]="processDataFromClipboard"
+    [suppressClipboardPaste] = "true"
+    [enableRangeSelection]="true"
+    (cellValueChanged) = "onRowValueChanged($event)"
+    [editType]="editType"
+    >
+</ag-grid-angular>
