@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
+import { AgGridChangeLogger } from './ag-grid-changeLogger/ag-grid-changeLogger';
 import * as XLSX from 'xlsx';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -12,11 +14,7 @@ export class AppComponent {
   private updateRowData: any;
   rowS = 'multiple';
   editType = "fullRow";
-  changeLog = {
-    insert: new Map(),
-    remove: new Map(),
-    update: new Map()
-  }
+
   constructor() {
     this.self = this;
   }
@@ -114,9 +112,7 @@ export class AppComponent {
   }
 
   onGridReady(params) {
-    this.gridApi = params.api;
-    this.updateRowData = this.gridApi.updateRowData.bind(this.gridApi);
-    this.gridApi.updateRowData = this.changeLogTracker.bind(this); // method overriding default updateRowData of ag grid
+    this.gridApi = new AgGridChangeLogger(params.api);
   }
 
   remove() {
@@ -124,75 +120,12 @@ export class AppComponent {
     this.gridApi.updateRowData({ remove: selectedData });
   }
 
-  changeLogTracker(obj) { 
-    for (var key of Object.keys(obj)) {
-      switch (key) {
-        case 'add':
-          this.insertHandler(obj);
-          break;
-        case 'remove':
-          this.removeHandler(obj);
-          break;
-        case 'update':
-          this.updateHandler(obj);
-          break;
-      }
-
-    }
-    this.updateRowData(obj);
-
-  }
-
-  getChangeLog() {
-    var obj = {
-      insert : [...this.changeLog.insert.values()],
-      update : [...this.changeLog.update.values()],
-      remove : [...this.changeLog.remove.values()]
-    }
-    console.log(obj);
-  }
-
-  insertHandler(data){
-    let addArr = data.add;
-    addArr.forEach((row) => { this.changeLog.insert.set(row.uuid,row);});
-  }
-
-  removeHandler(data) {
-    let removeArr = data.remove;
-    removeArr.forEach((row) => {
-      if (this.changeLog.insert.get(row.uuid)) {
-        this.changeLog.insert.delete(row.uuid);
-      } else {
-        if(this.changeLog.update.get(row.uuid)) 
-            this.changeLog.update.delete(row.uuid);
-
-        this.changeLog.remove.set(row.uuid, row);
-      }
-    })
-  }
-
-  updateHandler(data) {
-    let updateArr = data.update;
-    let _update = [];
-    updateArr.forEach((row) => {
-      if (this.changeLog.insert.get(row)) {
-        this.changeLog.insert.set(row, row);
-      } else {
-        this.changeLog.update.set(row.uuid,row);
-      }
-    })
-  }
-
-
-  processDataFromClipboard(params) {
-    console.log(params);
-    return params.values
+  getChangeLog(){
+   console.log(this.gridApi.getChangeLog());
   }
 
   onRowValueChanged(d) {
-    if(!this.changeLog.insert.get(d.data.uuid)){
-        this.changeLog.update.set(d.data.uuid,d.data)
-    }
-  }
+    this.gridApi.udpateRowValueChange(d);
+  }    
 
 }
