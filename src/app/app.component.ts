@@ -10,13 +10,9 @@ import * as XLSX from 'xlsx';
 export class AppComponent {
   title = 'app';
   gridApi;
-  self = this;
-  private updateRowData: any;
   rowS = 'multiple';
-  editType = "fullRow";
-
+  editType = "fullRow"
   constructor() {
-    this.self = this;
   }
   columnDefs = [
     { headerName: 'Make', field: 'make', sortable: true, editable: true },
@@ -112,7 +108,8 @@ export class AppComponent {
   }
 
   onGridReady(params) {
-    this.gridApi = new AgGridChangeLogger(params.api);
+    this.gridApi = new AgGridChangeLogger(params.api); // if needed multiple instance create like this or just extend 
+    this.gridApi.setSuppressClipboardPaste(true);
   }
 
   remove() {

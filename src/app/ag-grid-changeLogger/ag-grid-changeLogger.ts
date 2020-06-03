@@ -1,7 +1,16 @@
+/**
+ * Created By Shaik
+ *   
+ * AgGridChangeLogger is a class which helps to Identify the changes of data in ag grid
+ *
+ */
+
+
 export class AgGridChangeLogger {
 
     private gridApi;
     private updateRowData;
+
 
     constructor(grid) {
         this.gridApi = grid;
@@ -9,7 +18,7 @@ export class AgGridChangeLogger {
         this.gridApi.updateRowData = this.changeLogTracker.bind(this); // method overriding default updateRowData of ag grid
         this.gridApi.getChangeLog = this.getChangeLog.bind(this)// attach getChangeLoger for gridApi
         this.gridApi.udpateRowValueChange = this.onRowValueChanged.bind(this)// arrach row update for to tracks udpate
-        return this.gridApi;
+        return this.gridApi; //default return of constructor 
     }
 
     private changeLog = {
@@ -18,7 +27,7 @@ export class AgGridChangeLogger {
         update: new Map()
     }
 
-    changeLogTracker(obj) {
+    private changeLogTracker(obj):void {
         for (var key of Object.keys(obj)) {
             switch (key) {
                 case 'add':
@@ -36,9 +45,13 @@ export class AgGridChangeLogger {
         this.updateRowData(obj);
 
     }
-
-    getChangeLog() {
-        var obj = {
+    /**
+     * getChangeLog 
+     * 
+     * return an objet with changes set 
+     */
+    public getChangeLog(): Object {
+        let obj = {
             insert: [...this.changeLog.insert.values()],
             update: [...this.changeLog.update.values()],
             remove: [...this.changeLog.remove.values()]
@@ -46,12 +59,12 @@ export class AgGridChangeLogger {
         return obj;
     }
 
-    insertHandler(data) {
+    private insertHandler(data):void {
         let addArr = data.add;
         addArr.forEach((row) => { this.changeLog.insert.set(row.uuid, row); });
     }
 
-    removeHandler(data) {
+    private removeHandler(data):void {
         let removeArr = data.remove;
         removeArr.forEach((row) => {
             if (this.changeLog.insert.get(row.uuid)) {
@@ -65,7 +78,7 @@ export class AgGridChangeLogger {
         })
     }
 
-    updateHandler(data) {
+    private updateHandler(data) : void {
         let updateArr = data.update;
         let _update = [];
         updateArr.forEach((row) => {
@@ -77,11 +90,9 @@ export class AgGridChangeLogger {
         })
     }
 
-    onRowValueChanged(d) {
+    private onRowValueChanged(d): void {
         if (!this.changeLog.insert.get(d.data.uuid)) {
             this.changeLog.update.set(d.data.uuid, d.data)
         }
     }
-
-
 }

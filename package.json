@@ -21,6 +21,7 @@
     "@angular/router": "~9.1.9",
     "ag-grid-angular": "^23.1.1",
     "ag-grid-community": "^23.1.1",
+    "ag-grid-enterprise": "^23.1.1",
     "rxjs": "~6.5.4",
     "tslib": "^1.10.0",
     "xlsx": "^0.16.1",
